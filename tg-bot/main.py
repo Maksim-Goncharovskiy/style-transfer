@@ -15,6 +15,7 @@ from handlers import basic_router, nst_router
 from utils import create_bot_dir
 
 
+
 async def main():
     logging.info("Загрузка конфигурации...")
 
@@ -30,6 +31,9 @@ async def main():
         logging.info("Подключение Redis")
 
         redis = Redis(host='localhost', port=6379, db=0)
+        # Очистим кэш, потому что при перезапуске бота, некоторые пользователи могут застрять в состоянии ожидания
+        await redis.flushall()
+
         storage = RedisStorage(redis=redis)
 
         bot = Bot(token=app_config.bot.TOKEN,
@@ -44,6 +48,7 @@ async def main():
         logging.info("Запуск бота...")
 
         await dp.start_polling(bot)
+
 
 
 if __name__ == "__main__":

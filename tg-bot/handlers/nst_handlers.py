@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import Router
 from aiogram import F
 from aiogram.types import Message, FSInputFile
@@ -13,6 +15,8 @@ from fsm import FsmNstData
 
 from utils import create_user_temp_file, read_user_temp_file, delete_user_temp_dir, get_user_dir_full_path
 from utils.exceptions import BaseServerError
+
+from ml_services.transfer_style import transfer_style
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +41,7 @@ nst_router = Router()
 
 @nst_router.message(Command(commands=["nst"]), StateFilter(default_state))
 async def process_nst_request(message: Message, state: FSMContext):
-    await message.answer(LEXICON_RU["commands"]["nst"])
+    await message.answer(LEXICON_RU["nst"]["start"])
     await state.set_state(FsmNstData.send_content)
 
 
@@ -104,13 +108,21 @@ async def process_style_transfer_degree(message: Message, state: FSMContext):
         content = await read_user_temp_file(message.from_user.id, 'content.jpg')
         style = await read_user_temp_file(message.from_user.id, 'style.jpg')
 
-        """
-        Здесь происходит стилизация...
-        """
+        # Состояние пользователя переводим в ожидание:
+        await state.set_state(FsmNstData.wait_result)
 
+        # получение стилизации, задача добавляется в очередь celery:
+        result = transfer_style.delay(content.tobytes(), style.tobytes(), int(message.text))
+
+        # пока задача не выполнена, ждем результат, пользователь должен быть в состоянии ожидания
+        while not result.ready():
+            await asyncio.sleep(2)
+
+        # сохранение полученной стилизации в папку пользователя
         user_dir_path = await get_user_dir_full_path(message.from_user.id)
         photo = FSInputFile(user_dir_path + '/content.jpg')
 
+        # отправка ответа
         bot = message.bot
         await bot.send_photo(caption='Вот твоя стилизация:', chat_id=message.chat.id, photo=photo)
 
@@ -123,6 +135,13 @@ async def process_style_transfer_degree(message: Message, state: FSMContext):
         await state.clear()
 
 
+
 @nst_router.message(StateFilter(FsmNstData.send_degree))
 async def warn_incorrect_degree(message: Message):
     await message.answer(LEXICON_RU["nst"]["bad_degree"])
+
+
+
+@nst_router.message(StateFilter(FsmNstData.wait_result))
+async def wait_result(message: Message):
+    await message.answer(LEXICON_RU["nst"]["wait"])
