@@ -4,6 +4,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 from lexicon import LEXICON_RU
+from utils import delete_user_temp_dir
 
 
 basic_router = Router()
@@ -21,10 +22,17 @@ async def provide_help(message: Message):
 
 @basic_router.message(Command(commands=["cancel"]), StateFilter(default_state))
 async def handle_useless_cancel(message: Message):
+    """
+    Обработка команды /cancel вне машины состояний
+    """
     await message.answer(LEXICON_RU["commands"]["no_cancel"])
 
 
 @basic_router.message(Command(commands=["cancel"]), ~StateFilter(default_state))
-async def handle_useless_cancel(message: Message, state: FSMContext):
+async def handle_cancel(message: Message, state: FSMContext):
+    """
+    Обработка команды /cancel от пользователя, находящемся в каком-то из состояний
+    """
     await message.answer(LEXICON_RU["commands"]["cancel"])
+    await delete_user_temp_dir(user_id=message.from_user.id)
     await state.clear()

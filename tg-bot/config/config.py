@@ -6,6 +6,7 @@ import environs
 class BotConfig:
     TOKEN: str
     ADMIN_IDS: list[int]
+    DIR: str
 
 
 @dataclasses.dataclass
@@ -29,7 +30,8 @@ def load_config() -> Config:
     return Config(
         bot=BotConfig(
             TOKEN=env("BOT_TOKEN"),
-            ADMIN_IDS=list(map(int, env.list("ADMIN_IDS")))
+            ADMIN_IDS=list(map(int, env.list("ADMIN_IDS"))),
+            DIR=env("BOT_DIR")
         ),
         database=DatabaseConfig(
             HOST=env("HOST"),
