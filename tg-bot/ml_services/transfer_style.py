@@ -9,6 +9,7 @@ from celery_config import app
 from utils import bytes_to_image, image_to_bytes
 from .style_model import StyleModel
 
+
 BASE_CNN = None
 
 model_config = {
@@ -16,12 +17,12 @@ model_config = {
     "IMSIZE": (512, 512) if torch.cuda.is_available() else (256, 256),
     "OPTIMIZER": optim.Adam,
     "LR": 0.05,
-    "NUM_STEPS": 75,
+    "NUM_STEPS": 100,
     "STYLE_WEIGHT": 10**8,
     "SCHEDULER_STEP": None,
     "GAMMA": 1.0,
-    "CONTENT_LAYERS": [f'Conv_{i}' for i in range(12, 17)],
-    "STYLE_LAYERS": [f'Conv_{i}' for i in range(1, 5)]
+    "CONTENT_LAYERS": [f'Conv_{i}' for i in range(14, 17)],
+    "STYLE_LAYERS": [f'Conv_{i}' for i in range(1, 15)]
 }
 
 

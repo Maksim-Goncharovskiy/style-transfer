@@ -1,8 +1,9 @@
 import asyncio
+from gc import callbacks
 
 from aiogram import Router
 from aiogram import F
-from aiogram.types import Message, FSInputFile
+from aiogram.types import Message, FSInputFile, CallbackQuery
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
@@ -17,6 +18,7 @@ from services import create_user_temp_file, read_user_temp_file, delete_user_tem
 from services.exceptions import BaseServerError
 
 from ml_services.transfer_style import transfer_style
+from keyboards import start_keyboard, degree_keyboard
 
 
 logger = logging.getLogger(__name__)
@@ -52,6 +54,16 @@ async def process_nst_request(message: Message, state: FSMContext):
     await message.answer(LEXICON_RU["nst"]["start"])
     await state.set_state(FsmNstData.send_content)
 
+
+@nst_router.callback_query(F.data == 'start_nst', StateFilter(default_state))
+async def process_start_button_pressed(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer(LEXICON_RU["nst"]["start"])
+    await state.set_state(FsmNstData.send_content)
+
+
+@nst_router.callback_query(F.data == 'start_nst', ~StateFilter(default_state))
+async def warn_start_button_bad_pressed(callback: CallbackQuery, state: FSMContext):
+    await callback.answer(LEXICON_RU["nst"]["bad_button"])
 
 
 @nst_router.message(StateFilter(FsmNstData.send_content), F.photo)
@@ -97,7 +109,7 @@ async def process_style_photo(message: Message, state: FSMContext):
         await message.answer(LEXICON_RU["errors"]["internal_server_error"])
         await state.clear()
     else:
-        await message.answer(LEXICON_RU["nst"]["style"])
+        await message.answer(LEXICON_RU["nst"]["style"], reply_markup=degree_keyboard)
         await state.set_state(FsmNstData.send_degree)
 
 
@@ -108,47 +120,55 @@ async def warn_incorrect_style(message: Message):
 
 
 
-@nst_router.message(StateFilter(FsmNstData.send_degree), lambda x: x.text and x.text.isdigit() and 1 <= int(x.text) <= 5)
-async def process_style_transfer_degree(message: Message, state: FSMContext):
-    await message.answer(LEXICON_RU["nst"]["degree"])
+@nst_router.callback_query(StateFilter(FsmNstData.send_degree), F.data.in_([str(i) for i in range(1, 6)]))
+async def process_style_transfer_degree(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    await callback.message.answer(LEXICON_RU["nst"]["degree"])
 
     try:
-        content: bytes = await read_user_temp_file(message.from_user.id, 'content.jpg')
-        style: bytes = await read_user_temp_file(message.from_user.id, 'style.jpg')
+        content: bytes = await read_user_temp_file(user_id=user_id, filename='content.jpg')
+        style: bytes = await read_user_temp_file(user_id=user_id, filename='style.jpg')
 
         # Состояние пользователя переводим в ожидание:
         await state.set_state(FsmNstData.wait_result)
 
+        logger.debug(f"Стилизация для {callback.from_user.first_name} с id {user_id} в очереди.")
         # получение стилизации, задача добавляется в очередь celery:
-        result = transfer_style.delay(content, style, int(message.text))
+        result = transfer_style.delay(content, style, int(callback.data))
 
         # пока задача не выполнена, ждем результат, пользователь должен быть в состоянии ожидания
         while not result.ready():
             await asyncio.sleep(2)
 
+        logger.debug(f"Стилизация для {callback.from_user.first_name} с id {user_id} завершена.")
+
         # сохранение полученной стилизации в папку пользователя
-        await create_user_temp_file(user_id=message.from_user.id, img=result.get(), filename='result.jpg')
-        user_dir_path = await get_user_dir_full_path(message.from_user.id)
+        await create_user_temp_file(user_id=user_id, img=result.get(), filename='result.jpg')
+        user_dir_path = await get_user_dir_full_path(user_id=user_id)
         photo = FSInputFile(user_dir_path + '/result.jpg')
 
         # отправка ответа
-        bot = message.bot
-        await bot.send_photo(caption='Вот твоя стилизация:', chat_id=message.chat.id, photo=photo)
+        bot = callback.message.bot
+        await bot.send_photo(caption=LEXICON_RU["nst"]["done"], chat_id=callback.message.chat.id, photo=photo,
+                             reply_markup=start_keyboard)
 
     except BaseServerError as error:
         logger.error(error)
-        await message.answer(LEXICON_RU["errors"]["internal_server_error"])
+        await callback.message.answer(LEXICON_RU["errors"]["internal_server_error"])
 
     finally:
-        await delete_user_temp_dir(user_id=message.from_user.id)
+        await delete_user_temp_dir(user_id=user_id)
         await state.clear()
 
+
+@nst_router.callback_query(~StateFilter(FsmNstData.send_degree), F.data.in_([str(i) for i in range(1, 6)]))
+async def warn_degree_button_bad_pressed(callback: CallbackQuery):
+    await callback.answer(LEXICON_RU["nst"]["bad_button"])
 
 
 @nst_router.message(StateFilter(FsmNstData.send_degree))
 async def warn_incorrect_degree(message: Message):
     await message.answer(LEXICON_RU["nst"]["bad_degree"])
-
 
 
 @nst_router.message(StateFilter(FsmNstData.wait_result))
