@@ -4,7 +4,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 from lexicon import LEXICON_RU
-from utils import delete_user_temp_dir
+from services import delete_user_temp_dir
 
 
 basic_router = Router()

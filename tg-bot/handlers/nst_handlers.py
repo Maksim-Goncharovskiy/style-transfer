@@ -13,8 +13,8 @@ import sys
 from lexicon import LEXICON_RU
 from fsm import FsmNstData
 
-from utils import create_user_temp_file, read_user_temp_file, delete_user_temp_dir, get_user_dir_full_path
-from utils.exceptions import BaseServerError
+from services import create_user_temp_file, read_user_temp_file, delete_user_temp_dir, get_user_dir_full_path
+from services.exceptions import BaseServerError
 
 from ml_services.transfer_style import transfer_style
 
@@ -32,7 +32,15 @@ error_handler = logging.StreamHandler(sys.stderr)
 error_handler.setLevel(logging.ERROR)
 error_handler.setFormatter(formatter)
 
+class DebugFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelname == 'DEBUG'
+
+debug_handler = logging.StreamHandler(sys.stdout)
+debug_handler.addFilter(DebugFilter())
+
 logger.addHandler(error_handler)
+logger.addHandler(debug_handler)
 
 
 nst_router = Router()
@@ -55,10 +63,10 @@ async def process_content_photo(message: Message, state: FSMContext):
     downloaded_photo = await bot.download_file(photo.file_path)
 
     try:
-        await create_user_temp_file(message.from_user.id, downloaded_photo.read(), "content.jpg")
+        await create_user_temp_file(user_id=message.from_user.id, img=downloaded_photo.read(), filename="content.jpg")
     except BaseServerError as error:
         logger.error(error)
-        await delete_user_temp_dir(message.from_user.id)
+        await delete_user_temp_dir(user_id=message.from_user.id)
         await message.answer(LEXICON_RU["errors"]["internal_server_error"])
         await state.clear()
     else:
@@ -82,10 +90,10 @@ async def process_style_photo(message: Message, state: FSMContext):
     downloaded_photo = await bot.download_file(photo.file_path)
 
     try:
-        await create_user_temp_file(message.from_user.id, downloaded_photo.read(), "style.jpg")
+        await create_user_temp_file(user_id=message.from_user.id, img=downloaded_photo.read(), filename="style.jpg")
     except BaseServerError as error:
         logger.error(error)
-        await delete_user_temp_dir(message.from_user.id)
+        await delete_user_temp_dir(user_id=message.from_user.id)
         await message.answer(LEXICON_RU["errors"]["internal_server_error"])
         await state.clear()
     else:
@@ -105,22 +113,23 @@ async def process_style_transfer_degree(message: Message, state: FSMContext):
     await message.answer(LEXICON_RU["nst"]["degree"])
 
     try:
-        content = await read_user_temp_file(message.from_user.id, 'content.jpg')
-        style = await read_user_temp_file(message.from_user.id, 'style.jpg')
+        content: bytes = await read_user_temp_file(message.from_user.id, 'content.jpg')
+        style: bytes = await read_user_temp_file(message.from_user.id, 'style.jpg')
 
         # Состояние пользователя переводим в ожидание:
         await state.set_state(FsmNstData.wait_result)
 
         # получение стилизации, задача добавляется в очередь celery:
-        result = transfer_style.delay(content.tobytes(), style.tobytes(), int(message.text))
+        result = transfer_style.delay(content, style, int(message.text))
 
         # пока задача не выполнена, ждем результат, пользователь должен быть в состоянии ожидания
         while not result.ready():
             await asyncio.sleep(2)
 
         # сохранение полученной стилизации в папку пользователя
+        await create_user_temp_file(user_id=message.from_user.id, img=result.get(), filename='result.jpg')
         user_dir_path = await get_user_dir_full_path(message.from_user.id)
-        photo = FSInputFile(user_dir_path + '/content.jpg')
+        photo = FSInputFile(user_dir_path + '/result.jpg')
 
         # отправка ответа
         bot = message.bot

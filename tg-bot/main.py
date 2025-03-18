@@ -12,7 +12,7 @@ import sys
 
 from config import Config, load_config
 from handlers import basic_router, nst_router
-from utils import create_bot_dir
+from services import create_bot_dir
 
 
 

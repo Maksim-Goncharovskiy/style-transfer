@@ -5,6 +5,7 @@ import os
 import shutil
 from .exceptions import TgBotDirNotFound, UserDirNotFound, UserFileNotFound, UserDirCreationError, UserDirDeletionError
 from PIL import Image
+from utils import bytes_to_image, image_to_bytes
 
 
 TG_BOT_DIR = ""
@@ -74,7 +75,7 @@ async def read_user_temp_file(user_id: int, filename: str):
         raise UserFileNotFound(f"Файл {filename} не найден в папке пользователя {user_id}")
 
     else:
-        return Image.open(user_temp_file_path)
+        return image_to_bytes(Image.open(user_temp_file_path))
 
 
 
