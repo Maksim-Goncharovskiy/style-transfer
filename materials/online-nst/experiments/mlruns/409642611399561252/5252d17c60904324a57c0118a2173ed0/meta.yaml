@@ -1,0 +1,16 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/409642611399561252/5252d17c60904324a57c0118a2173ed0/artifacts
+deleted_time: 1742384501179
+end_time: 1742384236813
+entry_point_name: ''
+experiment_id: '409642611399561252'
+lifecycle_stage: deleted
+run_id: 5252d17c60904324a57c0118a2173ed0
+run_name: melodic-fish-159
+run_uuid: 5252d17c60904324a57c0118a2173ed0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742384236319
+status: 4
+tags: []
+user_id: maksim

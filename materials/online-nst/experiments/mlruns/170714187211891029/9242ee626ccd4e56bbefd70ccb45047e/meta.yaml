@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/170714187211891029/9242ee626ccd4e56bbefd70ccb45047e/artifacts
+end_time: 1742411680293
+entry_point_name: ''
+experiment_id: '170714187211891029'
+lifecycle_stage: active
+run_id: 9242ee626ccd4e56bbefd70ccb45047e
+run_name: fun-zebra-781
+run_uuid: 9242ee626ccd4e56bbefd70ccb45047e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742399748034
+status: 3
+tags: []
+user_id: maksim
