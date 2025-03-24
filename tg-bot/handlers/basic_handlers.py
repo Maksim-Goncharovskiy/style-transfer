@@ -1,4 +1,3 @@
-from aiogram import F
 from aiogram import Router
 from aiogram.types import Message, FSInputFile
 from aiogram.filters import Command, StateFilter
@@ -42,8 +41,3 @@ async def handle_cancel(message: Message, state: FSMContext):
     await message.answer(LEXICON_RU["commands"]["cancel"])
     await delete_user_temp_dir(user_id=message.from_user.id)
     await state.clear()
-
-
-@basic_router.message(StateFilter(default_state))
-async def answer_any(message: Message):
-    await message.answer(text=LEXICON_RU["default"], reply_markup=start_keyboard)

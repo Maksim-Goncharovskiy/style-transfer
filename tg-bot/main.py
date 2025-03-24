@@ -11,7 +11,7 @@ import logging
 import sys
 
 from config import Config, load_config
-from handlers import basic_router, nst_router
+from handlers import basic_router, nst_router, user_router
 from services import create_bot_dir
 
 from keyboards import set_main_menu
@@ -44,6 +44,7 @@ async def main():
         dp = Dispatcher(storage=storage)
         dp.include_router(basic_router)
         dp.include_router(nst_router)
+        dp.include_router(user_router)
 
         await set_main_menu(bot)
 

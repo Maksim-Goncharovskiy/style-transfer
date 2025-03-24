@@ -1,5 +1,4 @@
 import asyncio
-from gc import callbacks
 
 from aiogram import Router
 from aiogram import F
@@ -51,29 +50,45 @@ nst_router = Router()
 
 @nst_router.message(Command(commands=["nst"]), StateFilter(default_state))
 async def process_nst_request(message: Message, state: FSMContext):
+    """
+    Обработка команды /nst в дефолтном состоянии.
+    Переход в состояние ожидания фото-контента.
+    """
     await message.answer(LEXICON_RU["nst"]["start"])
     await state.set_state(FsmNstData.send_content)
 
 
 @nst_router.callback_query(F.data == 'start_nst', StateFilter(default_state))
 async def process_start_button_pressed(callback: CallbackQuery, state: FSMContext):
+    """
+    То же самое, что и хэндлер process_nst_request, только обрабатывается нажатие кнопки.
+    """
     await callback.message.answer(LEXICON_RU["nst"]["start"])
     await state.set_state(FsmNstData.send_content)
 
 
 @nst_router.callback_query(F.data == 'start_nst', ~StateFilter(default_state))
 async def warn_start_button_bad_pressed(callback: CallbackQuery, state: FSMContext):
+    """
+    Обработка ситуации нажатия кнопки в невалидном для этого состоянии (повторное нажатие).
+    """
     await callback.answer(LEXICON_RU["nst"]["bad_button"])
 
 
 @nst_router.message(StateFilter(FsmNstData.send_content), F.photo)
 async def process_content_photo(message: Message, state: FSMContext):
+    """
+    Обработка полученного фото-контента.
+    Скачивание и сохранение на сервер во временную директорию для пользователя.
+    """
     bot = message.bot
 
     photo_id = message.photo[-1].file_id
     photo = await bot.get_file(file_id=photo_id)
     downloaded_photo = await bot.download_file(photo.file_path)
 
+    # При сохранении файла может возникнуть исключительная ситуация, если вдруг файловая структура бота была нарушена
+    # (удаление папки бота/пользователя). Обрабатываем исключение, выводим лог.
     try:
         await create_user_temp_file(user_id=message.from_user.id, img=downloaded_photo.read(), filename="content.jpg")
     except BaseServerError as error:
@@ -122,6 +137,9 @@ async def warn_incorrect_style(message: Message):
 
 @nst_router.callback_query(StateFilter(FsmNstData.send_degree), F.data.in_([str(i) for i in range(1, 6)]))
 async def process_style_transfer_degree(callback: CallbackQuery, state: FSMContext):
+    """
+    Обработка степени стилизации. Запуск процедуры получения стилизации.
+    """
     user_id = callback.from_user.id
     await callback.message.answer(LEXICON_RU["nst"]["degree"])
 
