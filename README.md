@@ -8,12 +8,14 @@
 ## <a id="title1">1.Описание.</a>
 
 ## <a id="title2">2.Структура проекта.</a>
+```
 root/
 ├── tg-bot/          # Телеграм-бот
 └── materials/       # Модели и данные
     ├── online-nst/  # Online Neural Style Transfer  
     ├── adain/       # Adaptive Instance Normalization  
     └── cycle-gan/   # CycleGAN
+```
 
 ## <a id="title3">3.Технологии.</a>
 ### Tg-bot
