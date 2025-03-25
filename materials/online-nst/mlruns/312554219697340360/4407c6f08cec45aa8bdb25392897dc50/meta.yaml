@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/4407c6f08cec45aa8bdb25392897dc50/artifacts
+end_time: 1742416682158
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 4407c6f08cec45aa8bdb25392897dc50
+run_name: monumental-dog-686
+run_uuid: 4407c6f08cec45aa8bdb25392897dc50
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742416675459
+status: 3
+tags: []
+user_id: maksim

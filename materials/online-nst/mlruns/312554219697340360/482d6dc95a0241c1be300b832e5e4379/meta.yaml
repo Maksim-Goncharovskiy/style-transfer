@@ -1,0 +1,16 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/482d6dc95a0241c1be300b832e5e4379/artifacts
+deleted_time: 1742415200954
+end_time: 1742415191128
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: deleted
+run_id: 482d6dc95a0241c1be300b832e5e4379
+run_name: orderly-carp-367
+run_uuid: 482d6dc95a0241c1be300b832e5e4379
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742415156664
+status: 4
+tags: []
+user_id: maksim

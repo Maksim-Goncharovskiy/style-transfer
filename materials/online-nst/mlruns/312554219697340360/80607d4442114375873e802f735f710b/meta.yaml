@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/80607d4442114375873e802f735f710b/artifacts
+end_time: 1742415520649
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 80607d4442114375873e802f735f710b
+run_name: thoughtful-cod-996
+run_uuid: 80607d4442114375873e802f735f710b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742415474568
+status: 3
+tags: []
+user_id: maksim

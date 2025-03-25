@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/2335c7f40d0240aa9d97ffce4a0432ee/artifacts
+end_time: 1742416218880
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 2335c7f40d0240aa9d97ffce4a0432ee
+run_name: nebulous-ox-196
+run_uuid: 2335c7f40d0240aa9d97ffce4a0432ee
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742416206631
+status: 3
+tags: []
+user_id: maksim

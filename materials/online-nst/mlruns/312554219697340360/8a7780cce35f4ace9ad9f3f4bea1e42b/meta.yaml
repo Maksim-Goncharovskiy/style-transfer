@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/8a7780cce35f4ace9ad9f3f4bea1e42b/artifacts
+end_time: 1742415796772
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 8a7780cce35f4ace9ad9f3f4bea1e42b
+run_name: omniscient-bug-565
+run_uuid: 8a7780cce35f4ace9ad9f3f4bea1e42b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742415738753
+status: 3
+tags: []
+user_id: maksim

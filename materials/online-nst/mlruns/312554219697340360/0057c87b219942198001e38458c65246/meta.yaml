@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/0057c87b219942198001e38458c65246/artifacts
+end_time: 1742417756842
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 0057c87b219942198001e38458c65246
+run_name: placid-finch-67
+run_uuid: 0057c87b219942198001e38458c65246
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742417735964
+status: 3
+tags: []
+user_id: maksim

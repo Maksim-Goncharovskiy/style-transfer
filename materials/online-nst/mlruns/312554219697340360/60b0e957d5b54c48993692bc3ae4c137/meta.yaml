@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/60b0e957d5b54c48993692bc3ae4c137/artifacts
+end_time: 1742416443140
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 60b0e957d5b54c48993692bc3ae4c137
+run_name: burly-gull-284
+run_uuid: 60b0e957d5b54c48993692bc3ae4c137
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742416437787
+status: 3
+tags: []
+user_id: maksim

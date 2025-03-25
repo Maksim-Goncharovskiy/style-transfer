@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/51171a1efa034d9eab7d97f189b53571/artifacts
+end_time: 1742415449143
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 51171a1efa034d9eab7d97f189b53571
+run_name: angry-shrimp-470
+run_uuid: 51171a1efa034d9eab7d97f189b53571
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742415426214
+status: 3
+tags: []
+user_id: maksim

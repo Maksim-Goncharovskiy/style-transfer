@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/2f693c30d5554879b745a5d398592526/artifacts
+end_time: 1742416622331
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 2f693c30d5554879b745a5d398592526
+run_name: nervous-crane-379
+run_uuid: 2f693c30d5554879b745a5d398592526
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742416575755
+status: 3
+tags: []
+user_id: maksim

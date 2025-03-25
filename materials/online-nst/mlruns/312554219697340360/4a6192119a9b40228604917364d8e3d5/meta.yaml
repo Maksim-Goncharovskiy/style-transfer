@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/4a6192119a9b40228604917364d8e3d5/artifacts
+end_time: 1742417619780
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 4a6192119a9b40228604917364d8e3d5
+run_name: ambitious-sponge-323
+run_uuid: 4a6192119a9b40228604917364d8e3d5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742417608224
+status: 3
+tags: []
+user_id: maksim

@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/0d5ab8f74ceb41d7bfc05ec8e64ffda9/artifacts
+end_time: 1742418786364
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 0d5ab8f74ceb41d7bfc05ec8e64ffda9
+run_name: classy-eel-762
+run_uuid: 0d5ab8f74ceb41d7bfc05ec8e64ffda9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742418726667
+status: 3
+tags: []
+user_id: maksim

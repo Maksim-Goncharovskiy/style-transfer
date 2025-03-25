@@ -1,0 +1,15 @@
+artifact_uri: /home/maksim/Repos/style-transfer/materials/online-nst/experiments/mlruns/312554219697340360/29f1aa65f4a849c490b36c78422d53f5/artifacts
+end_time: 1742416413338
+entry_point_name: ''
+experiment_id: '312554219697340360'
+lifecycle_stage: active
+run_id: 29f1aa65f4a849c490b36c78422d53f5
+run_name: blushing-stork-238
+run_uuid: 29f1aa65f4a849c490b36c78422d53f5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1742416408001
+status: 3
+tags: []
+user_id: maksim
