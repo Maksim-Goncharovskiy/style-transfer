@@ -10,17 +10,15 @@ class BotConfig:
 
 
 @dataclasses.dataclass
-class DatabaseConfig:
+class RedisConfig:
     HOST: str
-    USER: str
-    NAME: str
-    PASSWORD: str
+    PORT: int
 
 
 @dataclasses.dataclass
 class Config:
     bot: BotConfig
-    database: DatabaseConfig
+    redis: RedisConfig
 
 
 def load_config() -> Config:
@@ -33,10 +31,8 @@ def load_config() -> Config:
             ADMIN_IDS=list(map(int, env.list("ADMIN_IDS"))),
             DIR=env("BOT_DIR")
         ),
-        database=DatabaseConfig(
-            HOST=env("HOST"),
-            USER=env("USER"),
-            NAME=env("NAME"),
-            PASSWORD=env("PASSWORD")
+        redis=RedisConfig(
+            HOST=env("REDIS_HOST"),
+            PORT=env("REDIS_PORT")
         )
     )

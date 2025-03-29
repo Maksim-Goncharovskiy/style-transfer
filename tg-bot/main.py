@@ -30,9 +30,9 @@ async def main():
         logging.critical(error)
 
     else:
-        logging.info("Подключение Redis")
+        logging.info(f"Подключение Redis: host={app_config.redis.HOST}  port={app_config.redis.PORT}")
 
-        redis = Redis(host='localhost', port=6379, db=0)
+        redis = Redis(host=app_config.redis.HOST, port=app_config.redis.PORT, db=0)
         # Очистим кэш, потому что при перезапуске бота, некоторые пользователи могут застрять в состоянии ожидания
         await redis.flushall()
 

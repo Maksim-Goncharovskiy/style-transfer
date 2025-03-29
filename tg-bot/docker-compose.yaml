@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  tg-bot:
+    container_name: tg-bot
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - BOT_TOKEN=<YOUR TOKEN>
+      - ADMIN_IDS=<YOUR IDs>
+      - BOT_DIR=./tg-bot-data-dir
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - 8000:8000
+    depends_on:
+      - redis
+    restart: always
+    networks:
+      - tg-bot-nw
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    networks:
+      - tg-bot-nw
+
+
+networks:
+  tg-bot-nw:
+    name: tg-bot-nw
