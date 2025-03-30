@@ -7,17 +7,20 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
 
+from redis.asyncio import Redis
+
 import logging
 import sys
 
+from config import load_config
 from lexicon import LEXICON_RU
 from fsm import FsmNstData
 
 from services import create_user_temp_file, read_user_temp_file, delete_user_temp_dir, get_user_dir_full_path
 from services.exceptions import BaseServerError
 
-from ml_services.transfer_style import transfer_style
-from keyboards import start_keyboard, degree_keyboard
+from ml_services.transfer_style import transfer_style_by_adain, transfer_style_by_gatys
+from keyboards import start_keyboard, degree_keyboard, method_keyboard
 
 
 logger = logging.getLogger(__name__)
@@ -44,6 +47,12 @@ logger.addHandler(error_handler)
 logger.addHandler(debug_handler)
 
 
+app_config = load_config()
+
+
+redis = Redis(host=app_config.redis.HOST, port=app_config.redis.PORT, db=2)
+
+
 nst_router = Router()
 
 
@@ -52,10 +61,11 @@ nst_router = Router()
 async def process_nst_request(message: Message, state: FSMContext):
     """
     Обработка команды /nst в дефолтном состоянии.
-    Переход в состояние ожидания фото-контента.
+    Переход в состояние ожидания выбора метода стилизации.
     """
-    await message.answer(LEXICON_RU["nst"]["start"])
-    await state.set_state(FsmNstData.send_content)
+    await message.answer(LEXICON_RU["nst"]["start"], reply_markup=method_keyboard)
+    await state.set_state(FsmNstData.send_method)
+
 
 
 @nst_router.callback_query(F.data == 'start_nst', StateFilter(default_state))
@@ -63,8 +73,9 @@ async def process_start_button_pressed(callback: CallbackQuery, state: FSMContex
     """
     То же самое, что и хэндлер process_nst_request, только обрабатывается нажатие кнопки.
     """
-    await callback.message.answer(LEXICON_RU["nst"]["start"])
-    await state.set_state(FsmNstData.send_content)
+    await callback.message.answer(LEXICON_RU["nst"]["start"], reply_markup=method_keyboard)
+    await state.set_state(FsmNstData.send_method)
+
 
 
 @nst_router.callback_query(F.data == 'start_nst', ~StateFilter(default_state))
@@ -73,6 +84,32 @@ async def warn_start_button_bad_pressed(callback: CallbackQuery, state: FSMConte
     Обработка ситуации нажатия кнопки в невалидном для этого состоянии (повторное нажатие).
     """
     await callback.answer(LEXICON_RU["nst"]["bad_button"])
+
+
+
+@nst_router.callback_query(StateFilter(FsmNstData.send_method), F.data.in_(["gatys", "adain"]))
+async def process_method(callback: CallbackQuery, state: FSMContext):
+    """
+    Обработка выбора метода стилизации.
+    """
+    await redis.set(f"{callback.from_user.id}", f"{callback.data}")
+    await callback.message.answer(LEXICON_RU["nst"]["method"])
+    await state.set_state(FsmNstData.send_content)
+
+
+
+@nst_router.callback_query(~StateFilter(FsmNstData.send_method), F.data.in_(["gatys", "adain"]))
+async def warn_method_button_bad_pressed(callback: CallbackQuery):
+    """
+    Обработка ситуации нажатия кнопки в невалидном для этого состоянии (повторное нажатие).
+    """
+    await callback.answer(LEXICON_RU["nst"]["bad_button"])
+
+
+@nst_router.message(StateFilter(FsmNstData.send_method))
+async def warn_incorrect_method(message: Message):
+    await message.answer(LEXICON_RU["nst"]["bad_method"])
+
 
 
 @nst_router.message(StateFilter(FsmNstData.send_content), F.photo)
@@ -141,7 +178,11 @@ async def process_style_transfer_degree(callback: CallbackQuery, state: FSMConte
     Обработка степени стилизации. Запуск процедуры получения стилизации.
     """
     user_id = callback.from_user.id
-    await callback.message.answer(LEXICON_RU["nst"]["degree"])
+
+    method = await redis.get(f"{user_id}")
+    method = method.decode("utf-8")
+
+    await callback.message.answer(LEXICON_RU["nst"][f"degree_{method}"])
 
     try:
         content: bytes = await read_user_temp_file(user_id=user_id, filename='content.jpg')
@@ -151,8 +192,13 @@ async def process_style_transfer_degree(callback: CallbackQuery, state: FSMConte
         await state.set_state(FsmNstData.wait_result)
 
         logger.debug(f"Стилизация для {callback.from_user.first_name} с id {user_id} в очереди.")
+
         # получение стилизации, задача добавляется в очередь celery:
-        result = transfer_style.delay(content, style, int(callback.data))
+        result = None
+        if method == 'gatys':
+            result = transfer_style_by_gatys.delay(content, style, int(callback.data))
+        else:
+            result = transfer_style_by_adain.delay(content, style, int(callback.data))
 
         # пока задача не выполнена, ждем результат, пользователь должен быть в состоянии ожидания
         while not result.ready():

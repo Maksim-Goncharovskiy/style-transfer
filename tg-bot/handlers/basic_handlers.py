@@ -15,7 +15,7 @@ basic_router = Router()
 @basic_router.message(Command(commands=["start"]), StateFilter(default_state))
 async def say_hello(message: Message):
     bot = message.bot
-    photo = FSInputFile('./example.jpg')
+    photo = FSInputFile('./files/start_image.jpg')
 
     await bot.send_photo(message.chat.id, photo, caption=LEXICON_RU["commands"]["start"], reply_markup=start_keyboard)
 
